@@ -36,6 +36,7 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 
 
 # Quick-start development settings - unsuitable for production
@@ -48,6 +49,8 @@ SECRET_KEY = 'hl%or(l5dg*zr2@qp*sutkv&q@(e!(@od9nc_=%p4hu%zmvlt@'
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+AUTH_USER_MODEL = 'member.User'
 
 
 # Application definition
@@ -63,6 +66,7 @@ INSTALLED_APPS = [
     'django_extensions',
 
     'post',
+    'member',
 ]
 
 MIDDLEWARE = [
@@ -80,7 +84,9 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            TEMPLATE_DIR,
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
