@@ -61,6 +61,20 @@ header.top-header > nav:nth-child(2) > div {
   margin: 0 auto;
 }
 
+form.form-inline-login {
+  font-size: 11px;
+}
+
+form.form-inline-login label {
+  margin-right: 5px;
+}
+
+form.form-inline-login input {
+  padding: 5px 8px;
+  font-size: 11px;
+  margin-right: 6px;
+}
+
 .container {
   max-width: 1010px;
   margin: 0 auto;
@@ -68,7 +82,11 @@ header.top-header > nav:nth-child(2) > div {
 }
 
 @media screen and (max-width: 700px) {
-  .container .nav-center {
-    display: none;
+  .container {
+    padding-top: 0;
   }
+}
+
+.container > .content {
+  padding: 0 10px;
 }

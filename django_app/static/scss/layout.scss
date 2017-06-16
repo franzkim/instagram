@@ -1,4 +1,4 @@
-@import "variables";
+@import 'variables';
 
 $screen-tablet: 700px;
 $header-height: 83px;
@@ -60,13 +60,26 @@ header.top-header > nav:nth-child(2) {
   }
 }
 
+form.form-inline-login {
+  font-size: 11px;
+
+  label {
+    margin-right: 5px;
+  }
+  input {
+    padding: 5px 8px;
+    font-size: 11px;
+    margin-right: 6px;
+  }
+}
 .container {
   max-width: 1010px;
   margin: 0 auto;
   padding-top: 40px;
   @media screen and (max-width: $screen-tablet) {
-    .nav-center {
-      display: none;
-    }
+    padding-top: 0;
   }
+}
+.container > .content {
+  padding: 0 10px;
 }
