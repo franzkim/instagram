@@ -32,7 +32,4 @@ urlpatterns = [
 
     # comment_create와 매칭
     url(r'^(?P<post_pk>\d+)/comment/create/$', views.comment_create, name='comment_create'),
-
-    # 위쪽의 결과들과 매칭되지 않을 경우
-    url(r'^.*/$', views.post_anyway, name='post_anyway'),
 ]

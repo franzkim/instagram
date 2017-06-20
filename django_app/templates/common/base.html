@@ -2,6 +2,7 @@
 <!--
 	템플릿 상속
 		https://docs.djangoproject.com/en/1.11/ref/templates/language/#template-inheritance
+
 	static 태그
 		https://docs.djangoproject.com/en/1.11/ref/templates/builtins/#static
 -->
@@ -20,6 +21,13 @@
 	<title>Instagram</title>
 </head>
 <body>
+	{% if messages %}
+	<div class="message">
+		{% for message in messages %}
+		<div>{{ message }}</div>
+		{% endfor %}
+	</div>
+	{% endif %}
 	<div id="wrap">
 		<header class="top-header">
 			<nav>
@@ -50,7 +58,7 @@
 				-->
 				<div>
 					{% if user.is_authenticated %}
-					<span>{{ user }}로 로그인 중</span>
+					<span>반갑습니다. {{ user }}님!</span>
 					<a href="{% url 'member:logout' %}" class="btn">로그아웃</a>
 					{% else %}
 					<form action="{% url 'member:login' %}" method="POST" class="form-inline-login">
