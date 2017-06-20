@@ -35,7 +35,7 @@
       <div class="btn-right">
         {% if user == post.author %}
         <a href="{% url 'post:post_modify' post_pk=post.pk %}" class="btn">수정하기</a>
-        <a href="" class="btn">삭제하기</a>
+        <a href="{% url 'post:post_delete' post_pk=post.pk %}" class="btn">삭제하기</a>
         {% endif %}
       </div>
     </div>
@@ -59,8 +59,10 @@
       {% endfor %}
     </div>
     <p class="created">{{ post.created_date }}</p>
-    <form action="">
-      <input type="text" placeholder="댓글달기" class="input-comment">
+    <form action="{% url 'post:comment_create' post_pk=post.pk %}" method="POST">
+      {% csrf_token %}
+      <!--<input type="text" placeholder="댓글달기" class="input-comment">-->
+      {{ comment_form.content }}
     </form>
   </div>
 </article>
