@@ -50,6 +50,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Custom User
 AUTH_USER_MODEL = 'member.User'
+LOGIN_URL = 'member:login'
+
+# Facebook
+
+FACEBOOK_APP_ID = '159182641289973'
+FACEBOOK_SECRET_CODE = 'd8b9c0d633e0b5c9f5ace5f156893abc'
 
 # Application definition
 INSTALLED_APPS = [
@@ -93,7 +99,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
 
-                'member.context_proccessors.forms',
+                'member.context_processors.forms',
+                'utils.context_processors.facebook.facebook_info',
             ],
         },
     },
