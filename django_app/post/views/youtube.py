@@ -1,15 +1,19 @@
 import requests
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.decorators.http import require_POST
 
-from post.models import Video
+from post.models import Video, Post, Comment
+from utils import youtube
 
 __all__ = (
     'youtube_search',
+    'post_create_with_video',
 )
 
 
-def youtube_search(request):
+def youtube_search_original(request):
     # [1] 검색결과를 DB에 저장하고, 해당내용을 템플릿에서 보여주기!
     # 1. 유튜브 영상을 저장할 class Video(models.Model)생성
     # 2. 검색결과의 videoId를 Video의 youtube_id필드에 저장
@@ -62,8 +66,8 @@ def youtube_search(request):
         # re_pattern = '|'.join(['({})'.format(item) for item in q.split()])
         # title과 description중 하나만 조건을 만족하면 됨
         videos = Video.objects.filter(
-            Q(title__regex=r'{}'.format(re_pattern)) |
-            Q(description__regex=r'{}'.format(re_pattern))
+            Q(title__iregex=r'{}'.format(re_pattern)) |
+            Q(description__iregex=r'{}'.format(re_pattern))
         )
 
         context = {
@@ -89,3 +93,45 @@ def youtube_search(request):
         # 해당 변수를 템플릿에서 표시
         context = {}
     return render(request, 'post/youtube_search.html', context)
+
+
+def youtube_search(request):
+    """
+    유튜브 검색을 라이브러리 형태로 정리
+    """
+    context = dict()
+    q = request.GET.get('q')
+    if q:
+        # YouTube검색부분을 패키지화
+        data = youtube.search(q)
+        for item in data['items']:
+            Video.objects.create_from_search_result(item)
+        re_pattern = ''.join(['(?=.*{})'.format(item) for item in q.split()])
+        videos = Video.objects.filter(
+            Q(title__regex=re_pattern) |
+            Q(description__regex=re_pattern)
+        )
+        context['videos'] = videos
+    return render(request, 'post/youtube_search.html', context)
+
+
+@require_POST
+@login_required
+def post_create_with_video(request):
+    # POST요청에서 video_pk값을 받음
+    video_pk = request.POST['video_pk']
+    # 받은 video_pk에 해당하는 Video인스턴스
+    video = get_object_or_404(Video, pk=video_pk)
+
+    # 해당 video를 갖는 Post생성
+    post = Post.objects.create(
+        author=request.user,
+        video=video,
+    )
+    # 생성한 Post객체의 my_comment에 해당하는 Comment생성
+    post.my_comment = Comment.objects.create(
+        post=post,
+        author=request.user,
+        content=video.title
+    )
+    return redirect('post:post_detail', post_pk=post.pk)
