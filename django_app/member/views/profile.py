@@ -1,7 +1,9 @@
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
 
-from member.forms import UserEditForm
+from ..forms import UserEditForm
 
 User = get_user_model()
 
@@ -12,7 +14,13 @@ __all__ = (
 
 
 def profile(request, user_pk=None):
-    NUM_POSTS_PER_PAGE = 3
+    # 유저가 로그인하지 않았으며 user_pk도 주어지지 않은 경우 (my_profile에 접근하려는 경우)
+    if not request.user.is_authenticated and not user_pk:
+        # login view로 이동시키며 뒤의 next get parameter에 다시 profile view의 URL을 붙여줌
+        login_url = reverse('member:login')
+        redirect_url = login_url + '?next=' + request.get_full_path()
+        return redirect(redirect_url)
+    num_posts_per_page = 6
     # 0. urls.py와 연결
     #   urls.py참조
     #
@@ -63,9 +71,10 @@ def profile(request, user_pk=None):
         user = request.user
 
     # page * 9만큼의 Post QuerySet을 리턴. 정렬순서는 created_date 내림차순
-    posts = user.post_set.order_by('-created_date')[:page * NUM_POSTS_PER_PAGE]
+    posts = user.post_set.order_by('-created_date')[:page * num_posts_per_page]
     post_count = user.post_set.count()
-    next_page = page + 1 if post_count > page * NUM_POSTS_PER_PAGE else None
+    # next_page = 현재 page에서 보여주는 Post개수보다 post_count가 클 경우 전달받은 page + 1, 아닐경우 None할당
+    next_page = page + 1 if post_count > page * num_posts_per_page else None
 
     context = {
         'cur_user': user,
@@ -84,20 +93,30 @@ def profile(request, user_pk=None):
     # 4~ -> def follow_toggle(request)뷰 생성
 
 
+@login_required
 def profile_edit(request):
     """
     request.method == 'POST'일 때
-        nickname과 img_profile(필드도 모델에 추가)을 수정할
+        nickname과 img_profile(필드도 모델에 추가)을 수정할 수 있는
         UserEditForm을 구성 (ModelForm상속)
         및 사용
+    1. UserEditForm구성
+    2. 이 view에서 request method가 GET일때,
+        해당 Form에 request.user에 해당하는 User를 이용해
+        bound form을 만듬
+    3. POST요청일 때, 받은 데이터를 이용해 Form에 bind된
+        User instance를 업데이트
     """
     if request.method == 'POST':
+        # UserEditForm에 수정할 data를 함께 binding
         form = UserEditForm(
             data=request.POST,
             files=request.FILES,
-            instance=request.user,
+            instance=request.user
         )
+        # data가 올바를 경우 (유효성 통과)
         if form.is_valid():
+            # form.save()를 이용해 instance를 update
             form.save()
             return redirect('member:my_profile')
     else:
