@@ -1,4 +1,6 @@
-from rest_framework import permissions, generics
+from rest_framework import status, permissions, generics
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from utils.permissions import ObjectIsRequestUser
 from ..models import User
@@ -6,7 +8,7 @@ from ..serializers import UserSerializer, UserCreationSerializer
 
 __all__ = (
     'UserListCreateView',
-    'UserRetrievedUpdateDestroyView',
+    'UserRetrieveUpdateDestroyView',
 )
 
 
@@ -20,7 +22,7 @@ class UserListCreateView(generics.ListCreateAPIView):
             return UserCreationSerializer
 
 
-class UserRetrievedUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+class UserRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (
